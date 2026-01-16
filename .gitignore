@@ -1,0 +1,35 @@
+# --- 临时文件与构建产物 ---
+# 忽略 tmp 文件夹，它通常存放 Air 的编译中间文件或运行日志
+/tmp/
+
+# 忽略 Go 的二进制可执行文件（编译后的产物）
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# 如果你编译后的文件名叫 main，也建议忽略
+/main
+
+# --- 项目依赖与配置文件 ---
+# 注意：不要忽略 go.mod 和 go.sum，它们是必须上传的
+# 如果你的 config.yaml 包含敏感信息（数据库密码、密钥），请取消下面一行的注释
+# config.yaml
+
+# 如果你有本地开发的私密配置，通常会命名为 config.local.yaml
+config.yaml
+.env
+
+# --- 开发工具 ---
+# Air 热重载工具的日志或临时产物（.air.toml 配置文件本身通常建议上传）
+# air_errors.log
+
+# IDE 特有文件 (VS Code / JetBrains)
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# --- 系统文件 ---
+.DS_Store
+Thumbs.db
