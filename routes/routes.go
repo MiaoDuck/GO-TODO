@@ -14,7 +14,7 @@ func SetupRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	//公开接口（注册 登录）
-	auth := r.Group("api/v1/auth")
+	auth := r.Group("/api/v1/auth")
 	{
 		auth.POST("/register", controllers.Register)
         auth.POST("/login", controllers.Login)	
