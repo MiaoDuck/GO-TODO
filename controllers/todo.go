@@ -13,7 +13,8 @@ var todoService = service.TodoService{}
 
 // GetTodos 获取所有任务
 func GetTodos(c *gin.Context) {
-	todos, err := todoService.GetAll()
+	userID, _ := c.Get("userID")
+	todos, err := todoService.GetAll(userID.(uint))
 	if err != nil {
 		common.Error(c, 500, "查询失败")
 		return
@@ -23,13 +24,14 @@ func GetTodos(c *gin.Context) {
 
 // CreateTask 创建任务
 func CreateTask(c *gin.Context) {
+	userID, _ := c.Get("userID")
 	var todo models.Todo
 	if err := c.ShouldBindJSON(&todo); err != nil {
 		common.Error(c, 400, err.Error())
 		return
 	}
 
-	if err := todoService.Create(&todo); err != nil {
+	if err := todoService.Create(userID.(uint), &todo); err != nil {
 		common.Error(c, 500, "创建失败")
 		return
 	}
@@ -38,8 +40,9 @@ func CreateTask(c *gin.Context) {
 
 // GetTodo 获取单个任务
 func GetTodo(c *gin.Context) {
+	userID, _ := c.Get("userID")
 	id := c.Param("id")
-	todo, err := todoService.GetByID(id)
+	todo, err := todoService.GetByID(userID.(uint), id)
 	if err != nil {
 		common.Error(c, 404, "任务没找到")
 		return
@@ -49,9 +52,10 @@ func GetTodo(c *gin.Context) {
 
 // UpdateTodo 更新任务
 func UpdateTodo(c *gin.Context) {
+	userID, _ := c.Get("userID")
 	id := c.Param("id")
 	// 1. 先查是否存在
-	todo, err := todoService.GetByID(id)
+	todo, err := todoService.GetByID(userID.(uint), id)
 	if err != nil {
 		common.Error(c, 404, "找不到该任务")
 		return
@@ -64,7 +68,7 @@ func UpdateTodo(c *gin.Context) {
 	}
 
 	// 3. 调用 Service 更新
-	if err := todoService.Update(&todo); err != nil {
+	if err := todoService.Update(userID.(uint), &todo); err != nil {
 		common.Error(c, 500, "更新失败")
 		return
 	}
@@ -73,8 +77,9 @@ func UpdateTodo(c *gin.Context) {
 
 // DeleteTodo 删除任务
 func DeleteTodo(c *gin.Context) {
+	userID, _ := c.Get("userID")
 	id := c.Param("id")
-	if err := todoService.Delete(id); err != nil {
+	if err := todoService.Delete(userID.(uint), id); err != nil {
 		common.Error(c, 500, "删除失败")
 		return
 	}
