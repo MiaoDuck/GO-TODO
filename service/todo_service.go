@@ -8,10 +8,28 @@ import (
 // 定义一个结构体，方便以后扩展（比如注入不同的 DB）
 type TodoService struct{}
 
-func (s *TodoService) GetAll(userID uint) ([]models.Todo, error) {
+func (s *TodoService) GetAll(userID uint, page int, pageSize int) ([]models.Todo, int64, error) {
     var todos []models.Todo
-    err := config.DB.Where("user_id = ?", userID).Find(&todos).Error
-    return todos, err
+    var total int64
+    
+    // 计算分页的 offset
+    if page < 1 {
+        page = 1
+    }
+    if pageSize < 1 {
+        pageSize = 10 // 默认每页 10 条
+    }
+    offset := (page - 1) * pageSize
+    
+    // 先查询总数
+    err := config.DB.Where("user_id = ?", userID).Model(&models.Todo{}).Count(&total).Error
+    if err != nil {
+        return nil, 0, err
+    }
+    
+    // 查询分页数据
+    err = config.DB.Where("user_id = ?", userID).Offset(offset).Limit(pageSize).Find(&todos).Error
+    return todos, total, err
 }
 
 func (s *TodoService) Create(userID uint, todo *models.Todo) error {

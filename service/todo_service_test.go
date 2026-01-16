@@ -14,14 +14,14 @@ import (
 
 // 初始化测试用的数据库
 func setupTestDB() *gorm.DB {
-	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
+	db, _ := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{
         Logger: logger.Default.LogMode(logger.Silent), 
     })
-	db.AutoMigrate(&models.Todo{})
-	return db
+    db.AutoMigrate(&models.Todo{})
+    return db
 }
 
-// TestGetAll 测试获取用户的所有 todo
+// TestGetAll 测试获取用户的所有 todo（支持分页）
 func TestGetAll(t *testing.T) {
 	db := setupTestDB()
 	config.DB = db
@@ -32,8 +32,8 @@ func TestGetAll(t *testing.T) {
 	db.Create(&models.Todo{Title: "任务2", Status: true, UserID: 1})
 	db.Create(&models.Todo{Title: "任务3", Status: false, UserID: 2}) // 其他用户的任务
 
-	// 测试获取用户 1 的所有任务
-	todos, err := s.GetAll(1)
+	// 测试获取用户 1 的所有任务（第1页，每页10条）
+	todos, total, err := s.GetAll(1, 1, 10)
 	if err != nil {
 		t.Errorf("期望没有错误，但得到了: %v", err)
 	}
@@ -43,11 +43,78 @@ func TestGetAll(t *testing.T) {
 		t.Errorf("期望返回 2 条任务，但得到了 %d 条", len(todos))
 	}
 
+	// 验证总数是正确的
+	if total != 2 {
+		t.Errorf("期望总数是 2，但得到了 %d", total)
+	}
+
 	// 验证所有返回的任务都属于用户 1
 	for _, todo := range todos {
 		if todo.UserID != 1 {
 			t.Errorf("期望所有任务的 UserID 都是 1，但得到了 %d", todo.UserID)
 		}
+	}
+}
+
+// TestGetAll_Pagination 测试分页功能
+func TestGetAll_Pagination(t *testing.T) {
+	db := setupTestDB()
+	config.DB = db
+	s := &TodoService{}
+
+	// 为用户 1 创建 15 个任务
+	for i := 1; i <= 15; i++ {
+		title := "task" + strconv.Itoa(i)
+		db.Create(&models.Todo{Title: title, Status: false, UserID: 1})
+	}
+
+	// 测试第 1 页，每页 10 条
+	todos, total, err := s.GetAll(1, 1, 10)
+	if err != nil {
+		t.Errorf("期望没有错误，但得到了: %v", err)
+	}
+	if len(todos) != 10 {
+		t.Errorf("期望第 1 页返回 10 条，但得到了 %d 条", len(todos))
+	}
+	if total != 15 {
+		t.Errorf("期望总数是 15，但得到了 %d", total)
+	}
+
+	// 测试第 2 页，每页 10 条
+	todos, total, err = s.GetAll(1, 2, 10)
+	if err != nil {
+		t.Errorf("期望没有错误，但得到了: %v", err)
+	}
+	if len(todos) != 5 {
+		t.Errorf("期望第 2 页返回 5 条，但得到了 %d 条", len(todos))
+	}
+	if total != 15 {
+		t.Errorf("期望总数是 15，但得到了 %d", total)
+	}
+}
+
+// TestGetAll_DefaultPageSize 测试分页参数维整
+func TestGetAll_DefaultPageSize(t *testing.T) {
+	db := setupTestDB()
+	config.DB = db
+	s := &TodoService{}
+
+	// 为用户 1 创建 25 个任务
+	for i := 1; i <= 25; i++ {
+		title := "task" + strconv.Itoa(i)
+		db.Create(&models.Todo{Title: title, Status: false, UserID: 1})
+	}
+
+	// 测试画幅参数（page < 1 时默认至 1，pageSize < 1 时默认至10）
+	todos, total, err := s.GetAll(1, 0, 0)
+	if err != nil {
+		t.Errorf("期望没有错误，但得到了: %v", err)
+	}
+	if len(todos) != 10 {
+		t.Errorf("期望默认每页 10 条，但得到了 %d 条", len(todos))
+	}
+	if total != 25 {
+		t.Errorf("期望总数是 25，但得到了 %d", total)
 	}
 }
 

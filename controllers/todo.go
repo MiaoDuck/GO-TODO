@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"go-todo/common" // 导入你定义的通用响应包
 	"go-todo/models"
 	"go-todo/service"
@@ -11,15 +12,42 @@ import (
 // 实例化 service
 var todoService = service.TodoService{}
 
-// GetTodos 获取所有任务
+// GetTodos 获取所有任务（支持分页）
 func GetTodos(c *gin.Context) {
 	userID, _ := c.Get("userID")
-	todos, err := todoService.GetAll(userID.(uint))
+	
+	// 从查询参数获取分页信息
+	page := 1
+	pageSize := 10
+	
+	if p := c.Query("page"); p != "" {
+		if _, err := fmt.Sscanf(p, "%d", &page); err != nil {
+			common.Error(c, 400, "page 参数格式错误")
+			return
+		}
+	}
+	
+	if ps := c.Query("pageSize"); ps != "" {
+		if _, err := fmt.Sscanf(ps, "%d", &pageSize); err != nil {
+			common.Error(c, 400, "pageSize 参数格式错误")
+			return
+		}
+	}
+	
+	// 调用 service 获取分页数据
+	todos, total, err := todoService.GetAll(userID.(uint), page, pageSize)
 	if err != nil {
 		common.Error(c, 500, "查询失败")
 		return
 	}
-	common.Success(c, todos)
+	
+	// 返回分页数据
+	common.Success(c, gin.H{
+		"data":      todos,
+		"page":      page,
+		"pageSize":  pageSize,
+		"total":     total,
+	})
 }
 
 // CreateTask 创建任务
