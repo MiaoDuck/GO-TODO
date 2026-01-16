@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"go-todo/common"
 	"go-todo/config"
 	"go-todo/models"
 
@@ -36,19 +37,28 @@ func (s *UserService) Register(username, password string) error {
 
 
 
-func (s *UserService) Login(username, password string) (models.User, error) {
-    var user models.User
-    // 1. 查找用户是否存在
-    if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil {
-        return user, errors.New("用户不存在")
-    }
+// Login 登录逻辑
+func (s *UserService) Login(username, password string) (string, error) {
+	var user models.User
+	
+	// 1. 根据用户名找用户
+	if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		return "", errors.New("用户不存在")
+	}
 
-    // 2. 比较加密后的密码
-    // bcrypt.CompareHashAndPassword 会自动处理盐值并对比
-    err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-    if err != nil {
-        return user, errors.New("密码错误")
-    }
+	// 2. 验证密码 (核心！)
+	//哪怕你拿到了数据库里的密码 user.Password (是乱码)，你也不能直接 == 对比
+	// 必须用 bcrypt.CompareHashAndPassword
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return "", errors.New("密码错误")
+	}
 
-    return user, nil
+	// 3. 密码正确，生成 JWT Token
+	token, err := common.GenerateToken(user.ID)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

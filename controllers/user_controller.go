@@ -34,22 +34,23 @@ func Register(c *gin.Context) {
 // Login 用户登录
 func Login(c *gin.Context) {
     var req AuthRequest
+    // 1. 绑定并校验参数
     if err := c.ShouldBindJSON(&req); err != nil {
-        common.Error(c, 400, "参数验证失败")
+        common.Error(c, 400, "参数验证失败: "+err.Error())
         return
     }
 
-    user, err := userService.Login(req.Username, req.Password)
+    // 2. 调用 Service 进行登录验证并获取 Token
+    // 这里的 token 变量接收的就是 service 返回的字符串
+    token, err := userService.Login(req.Username, req.Password)
     if err != nil {
+        // 登录失败（用户不存在或密码错误）返回 401
         common.Error(c, 401, err.Error())
         return
     }
 
-    // TODO: 这里需要生成 JWT Token 返回给前端
-    // 目前我们先返回用户信息测试
+    // 3. 登录成功，直接把 Token 返回给前端
     common.Success(c, gin.H{
-        "user_id":  user.ID,
-        "username": user.Username,
-        "token":    "这里之后替换为生成的JWT-TOKEN", 
+        "token": token,
     })
 }

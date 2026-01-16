@@ -13,6 +13,7 @@ func SetupRouter() *gin.Engine {
 	//初始化Gin引擎
 	r.Use(gin.Recovery())
 
+	//公开接口（注册 登录）
 	auth := r.Group("api/v1/auth")
 	{
 		auth.POST("/register", controllers.Register)
@@ -22,6 +23,7 @@ func SetupRouter() *gin.Engine {
     v1 := r.Group("/api/v1")//路由分组
 	//前缀管理：在这个组下面定义的路由，都会自动带上/api/v1
 	//版本控制
+	v1.Use(middleware.AuthMiddleware())
     {
         // 这里的 controllers.GetTodos 对应上面定义的函数
         v1.POST("/todos", controllers.CreateTask)
