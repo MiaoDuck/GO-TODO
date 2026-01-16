@@ -51,6 +51,15 @@ func GetTodos(c *gin.Context) {
 }
 
 // CreateTask 创建任务
+// @Summary 创建一个新任务
+// @Description 需要传递 title 字段，user_id 会自动从 Token 获取
+// @Tags Todos
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param todo body models.Todo true "任务信息"
+// @Success 200 {object} common.Response
+// @Router /todos [post]
 func CreateTask(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	var todo models.Todo

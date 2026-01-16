@@ -1,0 +1,93 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "这是一个基于 Gin + GORM 的任务管理后端。",
+        "title": "Go Todo API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/todos": {
+            "post": {
+                "description": "需要传递 title 字段，user_id 会自动从 Token 获取",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "创建一个新任务",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "任务信息",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Todo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "common.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码，200表示成功",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "数据，用 interface{} 表示可以是任意类型"
+                },
+                "msg": {
+                    "description": "提示信息",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Todo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "主键",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "完成状态：true完成, false未完成",
+                    "type": "boolean"
+                },
+                "title": {
+                    "description": "任务标题",
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "🔥 新增：外键关联",
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
