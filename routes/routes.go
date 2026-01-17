@@ -10,8 +10,11 @@ import (
 func SetupRouter() *gin.Engine {
     r := gin.New()
 	r.Use(middleware.Logger())
+	r.Use(middleware.Cors())
 	//初始化Gin引擎
 	r.Use(gin.Recovery())
+	// 捕获和处理运行时发生的 panic 错误，防止程序因未捕获的 panic 而崩溃，
+	// 转而返回一个标准的 HTTP 500 错误响应给客户端，常用于生产环境确保应用的健壮性。 
 
 	//公开接口（注册 登录）
 	auth := r.Group("/api/v1/auth")
