@@ -1,0 +1,36 @@
+services:
+  # 1. 你的 Go 应用服务
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy # 只有等 db 健康检查通过了再启动 app
+    environment:
+      # 这里的 mysql-db 对应下面的服务名
+      # 我们可以通过环境变量覆盖 config.yaml 里的配置！(Viper 的强大之处)
+      - DATABASE_HOST=db 
+      - DATABASE_PASSWORD=root  # 对应下面的 MYSQL_ROOT_PASSWORD
+
+  # 2. MySQL 服务
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: todo_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    # --- 新增健康检查部分 ---
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s     # 每 5 秒检查一次
+      timeout: 5s      # 每次检查超时时间
+      retries: 10      # 最多重试 10 次
+      start_period: 10s # 容器启动后 10 秒再开始检查（给 MySQL 一点初始化时间）
+
+volumes:
+  db_data:

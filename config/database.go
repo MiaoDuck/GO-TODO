@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"go-todo/models"
+	"strings"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -17,9 +18,14 @@ func InitConfig() {
 	viper.SetConfigType("yaml")   // 配置文件类型
 	viper.AddConfigPath(".")      // 查找当前目录
 
-	if err := viper.ReadInConfig(); err != nil {
-		panic(fmt.Errorf("fatal error config file: %w", err))
-	}
+	viper.AutomaticEnv()                            // 允许 Viper 读取环境变量
+    viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // 将 database.host 映射为 DATABASE_HOST
+    // -----------------------
+
+    if err := viper.ReadInConfig(); err != nil {
+        // 如果找不到配置文件且没有环境变量，才报错
+        fmt.Printf("警告: 未找到配置文件: %v，将尝试从环境变量读取\n", err)
+    }
 }
 
 func ConnectDatabase() {
