@@ -3,6 +3,7 @@
 ![Gin Framework](https://img.shields.io/badge/framework-Gin-green.svg)
 ![Docker Supported](https://img.shields.io/badge/docker-supported-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-red.svg)
+
 一个基于 Gin + GORM 的任务管理后端应用，支持用户认证、任务创建、查询、更新和删除功能。
 
 ## 🚀 功能特性
