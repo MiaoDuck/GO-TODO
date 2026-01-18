@@ -1,5 +1,8 @@
 # Go Todo API
-
+![Go Version](https://img.shields.io/badge/go-1.25.5-blue.svg)
+![Gin Framework](https://img.shields.io/badge/framework-Gin-green.svg)
+![Docker Supported](https://img.shields.io/badge/docker-supported-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-red.svg)
 一个基于 Gin + GORM 的任务管理后端应用，支持用户认证、任务创建、查询、更新和删除功能。
 
 ## 🚀 功能特性
@@ -19,7 +22,7 @@
 | 框架 | Gin Web Framework | v1.11.0 |
 | ORM | GORM | v1.31.1 |
 | 数据库驱动 | MySQL | v1.6.0 |
-| 数据库驱动 | SQLite | v1.11.0 |
+| 数据库驱动（测试） | SQLite | v1.11.0 |
 | 认证 | JWT | v5.3.0 |
 | 加密 | golang.org/x/crypto | v0.47.0 |
 | 配置管理 | Viper | v1.21.0 |
@@ -300,14 +303,4 @@ Viper 支持环境变量覆盖，可通过设置 `DATABASE_HOST`、`DATABASE_PAS
 - 查看日志：`docker-compose logs`
 - 确保 Docker daemon 正在运行
 
-## 📄 许可证
 
-[添加你的许可证信息]
-
-## 👥 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## 📞 联系方式
-
-[添加你的联系方式或项目信息]
