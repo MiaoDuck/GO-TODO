@@ -1,13 +1,18 @@
 package models
 
-// Todo 结构体，对应数据库中的 todos 表
+// Todo 任务模型
+// @Description 任务信息结构体
 type Todo struct {
-	ID     uint   `json:"id" gorm:"primaryKey"` // 主键
-	Title  string `json:"title"`                // 任务标题
-	Status bool   `json:"status"`               // 完成状态：true完成, false未完成
-
-	// 🔥 新增：外键关联
-	UserID uint `json:"user_id"` // 属于哪个用户
+	// 任务 ID
+	ID uint `json:"id" gorm:"primaryKey" example:"1"`
+	// 任务标题
+	Title string `json:"title" example:"完成项目文档"`
+	// 任务描述
+	Description string `json:"description" example:"编写详细的 README 和 API 文档"`
+	// 完成状态：true 完成, false 未完成
+	Status bool `json:"status" example:"false"`
+	// 所属用户 ID
+	UserID uint `json:"user_id" example:"1"`
 }
 
 // 注意那个 `json:"title"`

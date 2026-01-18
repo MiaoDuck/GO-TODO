@@ -6,11 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 定义通用的响应结构
+// Response 统一响应结构
+// @Description API 统一响应格式
 type Response struct {
-	Code int         `json:"code"` // 业务状态码，200表示成功
-	Msg  string      `json:"msg"`  // 提示信息
-	Data interface{} `json:"data"` // 数据，用 interface{} 表示可以是任意类型
+	// 业务状态码（200 表示成功，其他表示失败）
+	Code int `json:"code" example:"200"`
+	// 提示消息
+	Msg string `json:"msg" example:"success"`
+	// 响应数据（可以是任意类型）
+	Data interface{} `json:"data"`
 }
 
 // 成功返回

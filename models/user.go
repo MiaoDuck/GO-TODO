@@ -2,9 +2,15 @@ package models
 
 import "gorm.io/gorm"
 
+// User 用户模型
+// @Description 用户信息结构体
 type User struct {
-	gorm.Model        // gorm.Model 自带 ID, CreatedAt, UpdatedAt, DeletedAt
-	Username   string `gorm:"unique" json:"username"` // 用户名唯一
-	Password   string `json:"-"`                      // json:"-" 表示返回 JSON 时忽略该字段，防止密码泄露！
-	Todos      []Todo `json:"todos"`                  // 一对多关联：一个用户有多个 Todo
+	// 数据库标准字段：ID, CreatedAt, UpdatedAt, DeletedAt
+	gorm.Model
+	// 用户名，全局唯一
+	Username string `gorm:"unique" json:"username" example:"john_doe"`
+	// 密码（JSON 返回时忽略，防止泄露）
+	Password string `json:"-"`
+	// 该用户的所有任务
+	Todos []Todo `json:"todos"`
 }
